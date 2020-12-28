@@ -9,6 +9,13 @@
 # First argument is the address to ping
 # Second argument is the time interval in minutes for sending statistics to external log file
 #
+
+# Features to be considered
+# 1. Custom log name and location
+# 2. Multiple Destination Arguments
+# 3. Check if log file exist and avoid over-writing if so
+# 4. --help flag with standarised instructions
+
 # Logfile location and name
 logfile=~/ping.log;
 logLen=50;
