@@ -4,9 +4,9 @@ session=Tom;
 #check=$(tmux ls | grep -o $session);
 
 start=$(tmux new -s $session \;\
-		split-window 'echo 4109 | sudo -S dmesg -T --follow' \;\
-		split-window top \;\
 		split-window 'tail -f /var/log/syslog' \;\
+		split-window top \;\
+		split-window 'echo 4109 | sudo -S dmesg -T --follow' \;\
 		select-pane -t 0 \;\
 		select-layout tiled \;\
 		new-window 'ssh pi' \;\

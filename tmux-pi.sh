@@ -3,9 +3,9 @@
 session=Pi;
 
 start=$(tmux new -s $session \;\
+    split-window 'watch -n 1 vcgencmd measure_temp' \;\
     split-window top \;\
     split-window 'echo 4109 | sudo -S dmesg -T --follow' \;\
-    split-window 'watch -n 1 vcgencmd measure_temp' \;\
     select-layout tiled \;\
     select-pane -t 0);
     
