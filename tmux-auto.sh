@@ -4,12 +4,23 @@ session=Tom;
 #check=$(tmux ls | grep -o $session);
 
 start=$(tmux new  -s $session -n Bash \;\
+		split-window 'echo 4109 | sudo -S dmesg -T --follow' \;\
 		split-window top \;\
 		split-window 'tail -f /var/log/syslog' \;\
-		select-layout main-horizontal \;\
+		select-pane -t 0 \;\
+		select-layout tiled \;\
 		new-window 'ssh pi' \;\
-		select-window -t 0 \;\
-		select-pane -t 0);
+		select-window -t 0);
+
+		#split-window top \;\
+		#split-window 'tail -f /var/log/syslog' \;\
+		#split-window 'echo 4109 | sudo -S dmesg -T --follow' \;\
+		#select-layout main-horizontal \;\
+		#new-window 'ssh pi' \;\
+		#select-window -t 0);
+		#split-window 'echo 4109 | sudo -S dmesg -T --follow' \;\
+		#select-pane -t 0 \;\
+		#select-layout even-vertical);
 
 #if [[ $check == $session ]]
 #	then
