@@ -3,7 +3,7 @@
 session=Tom;
 #check=$(tmux ls | grep -o $session);
 
-start=$(tmux new  -s $session -n Bash \;\
+start=$(tmux new -s $session \;\
 		split-window 'echo 4109 | sudo -S dmesg -T --follow' \;\
 		split-window top \;\
 		split-window 'tail -f /var/log/syslog' \;\
