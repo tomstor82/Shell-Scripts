@@ -11,68 +11,135 @@
 #
 
 # Features to be considered
-# 1. Custom log name and location
-# 2. Multiple Destination Arguments
-# 3. Check if log file exist and avoid over-writing if so
-# 4. --help flag with standarised instructions
+# 1. Multiple Destination Arguments
+# 2. Verbose and silent mode * use loop to iterate over arguments $@
 
-# Logfile location and name
-logfile=~/ping.log;
-logLen=50;
+# ********** Investigate if script can be run simultaneously without causing error to file writing *************
 
-# Check if arguments are passed
-if [ -z $1 ]
+# Default logfile location and name
+LOGFILE=~/ping.log;
+
+# Logfile size max lines
+LOGSIZE=100;
+
+# Check arguments
+if [[ $1 == '-h' ]] || [[ $1 == '--help' ]]
 then
-	echo "Please supply IP or Host Name for ping destination, as first argument";
-	echo "Example: pinglog 7.7.7.7 10"
+	printf '\npinglog logs statistics at specified time interval to external file,
+and can display alternative traceroute isolated IPs.\n
+usage: pinglog [-h] [--help] [-l] [--log] [ip/host...] [-r] [--route] [time]\n
+default logfile is ~/ping.log (can be changed in script line 21).\n
+Valid arguments for IP is IPv4, IPv6 and hostname.
+Valid arguments for time are digits followed by denominator.
+s/m/h for respectively seconds, minutes and hours.\n
+	Example 1: pinglog 9.9.9.9 1.5h
+	Example 2: pinglog yahoo.com -r;
+	Example 3: pinglog --log\n';
+	exit;
+elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]
+then
+	tail -f $LOGFILE;
+	exit;
+elif [ -z $1 ]
+then
+	printf "Please supply IP or Host Name for ping destination, as first argument\n
+	Example: pinglog 7.7.7.7 10m\n";
 	exit;
 else
 	IP=$1;
 fi;
-if [ -z $2 ]
+
+if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]
 then
-	echo "Please supply interval in minutes for writing to log file, as second argument";
-	echo "Example: pinglog 7.7.7.7 10"
+	traceroute $IP | grep -Po '\(\d+\.\d+\.\d+\.\d+\)' | grep -v "$IP" | grep -Po '\d+\.\d+\.\d+\.\d+';
+	exit;
+elif [ -z $2 ]
+then
+	printf "Please supply time interval for writing to log file, as second argument\n
+	Formats accepted are: 30s/10m/1h\n
+	Example: pinglog 7.7.7.7 30s\n";
 	exit;
 else
 	SLEEP=$2;
 fi;
 
+# Search arguments for flags
+for flag in $@
+do
+	if [[ $flag == '-v' ]] || [[ $flag == '--verbose' ]]
+	then
+		verbose=true;
+	fi;
+done;
+
+# ************ Needs to be tested ******************
+# Switch statement
+#for flag in $@
+#do
+#	case "$flag" in
+#	'-v') verbose=true;;
+#	'--verbose') verbose=true;;
+#	'-h') help=true;;
+#	'--help') help=true;;
+#	'-r') route=true;;
+#	'--route') route=true;;
+#	'-l') log=true;;
+#	'--log') log=true;;
+#	*) ;;
+#	esac;
+#done;
+
+
 # check if logfile has entries and if so backup
-if [ -n $logfile ]
+if [ -n $LOGFILE ]
 then
-	cat $logfile > ${logfile}.1;
+	cat $LOGFILE > ${LOGFILE}.1;
 fi;
 
 # function for statistics and timestamp
-pingStats() {
-	# store process id to PID variable
-	PID=$!;
+function pingStats() {
+	if [[ $verbose == true ]]
+	then
+		ping -O "$IP" 2>> "$LOGFILE" &
+	else
+		ping -O "$IP" 1> /dev/null 2>> "$LOGFILE" &
+	fi;
 
-	# add header and clear logfile
-	echo "Destination $IP" > "$logfile";
-	
+	# store process id to pid variable
+	pid=$!;
 	# declare command variable as non empty string to allow for loop to start
-	command='start';
+	command="1";
 
 	# do loop until command variable length is Zero
 	until [ -z command ]
 	do
 		# set interval
-		sleep "${SLEEP}m";
+		sleep "${SLEEP}";
 		# timestamp and send quit signal to trigger ping status
-		date >> $logfile & kill -SIGQUIT "$PID";
-		# delete line 2 and 3 leaving line 1 as it contains the header, when log exceeds 50 lines
-		if [[ $logLines -gt 50 ]]
+		echo "Destination $IP on $(date)" >> $LOGFILE &&\
+		sleep 2;
+		kill -SIGQUIT "$pid";
+		# delete first two lines of log when exceeding set log size
+		if [[ $logLines -gt $LOGSIZE ]]
 		then
-			sed -i '2,3d' "$logfile";
+			sed -i '1,2d' "$LOGFILE";
 		fi;
 		# update size of logfile
-		logLines=$(wc -l $logfile | grep -Po '\d+');
+		logLines=$(wc -l $LOGFILE | grep -Po '\d+');
 		# update command variable
-		command=$(ps "$PID" | grep -o ping);
+		command=$(ps "$pid" | grep -o ping);
 	done;
+	tail -f $LOGFILE;
 }
 
-# Starting ping application
-ping -O "$IP" 2>> "$logfile" & pingStats;
+# Notification of logfile
+echo "Ping summary stored in file $LOGFILE";
+
+# Running script
+pingStats;
+#if [[ $verbose == true ]]
+#then
+#	ping -O "$IP" 2>> "$LOGFILE" & pingStats;	
+#else
+#	ping -O "$IP" 1> /dev/null 2>> "$LOGFILE" & pingStats;
+#fi;
