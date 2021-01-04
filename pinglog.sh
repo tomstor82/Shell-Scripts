@@ -15,6 +15,7 @@
 # 2. Verbose and silent mode * use loop to iterate over arguments $@
 
 # ********** Investigate if script can be run simultaneously without causing error to file writing *************
+# sigaction(2) - to handle CTRL-C command and killing proccesses left behind
 
 # Default logfile location and name
 LOGFILE=~/ping.log;
@@ -27,7 +28,7 @@ if [[ $1 == '-h' ]] || [[ $1 == '--help' ]]
 then
 	printf '\npinglog logs statistics at specified time interval to external file,
 and can display alternative traceroute isolated IPs.\n
-usage: pinglog [-h] [--help] [-l] [--log] [ip/host...] [-r] [--route] [time]\n
+usage: pinglog [-h] [--help] [-l] [--log] [ip/host...] [-r] [--route] [interval] [-s] [--silent] \n
 default logfile is ~/ping.log (can be changed in script line 21).\n
 Valid arguments for IP is IPv4, IPv6 and hostname.
 Valid arguments for time are digits followed by denominator.
@@ -35,16 +36,15 @@ s/m/h for respectively seconds, minutes and hours.\n
 	Example 1: pinglog 9.9.9.9 1.5h
 	Example 2: pinglog yahoo.com -r;
 	Example 3: pinglog --log\n';
-	exit;
+	exit 0;
 elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]
 then
 	tail -f $LOGFILE;
-	exit;
+	exit 0;
 elif [ -z $1 ]
 then
-	printf "Please supply IP or Host Name for ping destination, as first argument\n
-	Example: pinglog 7.7.7.7 10m\n";
-	exit;
+	printf "pinglog: Missing destination argument -- '2'\nTry 'pinglog --help' for more information.\n"
+	exit 2;
 else
 	IP=$1;
 fi;
@@ -55,10 +55,8 @@ then
 	exit;
 elif [ -z $2 ]
 then
-	printf "Please supply time interval for writing to log file, as second argument\n
-	Formats accepted are: 30s/10m/1h\n
-	Example: pinglog 7.7.7.7 30s\n";
-	exit;
+	printf "pinglog: Missing interval argument -- '3'\nTry 'pinglog --help' for more information.\n"
+	exit 3;
 else
 	SLEEP=$2;
 fi;
@@ -66,9 +64,9 @@ fi;
 # Search arguments for flags
 for flag in $@
 do
-	if [[ $flag == '-v' ]] || [[ $flag == '--verbose' ]]
+	if [[ $flag == '-s' ]] || [[ $flag == '--silent' ]]
 	then
-		verbose=true;
+		verbose=false;
 	fi;
 done;
 
@@ -98,11 +96,11 @@ fi;
 
 # function for statistics and timestamp
 function pingStats() {
-	if [[ $verbose == true ]]
+	if [[ $verbose == false ]]
 	then
-		ping -O "$IP" 2>> "$LOGFILE" &
-	else
 		ping -O "$IP" 1> /dev/null 2>> "$LOGFILE" &
+	else
+		ping -O "$IP" 2>> "$LOGFILE" &
 	fi;
 
 	# store process id to pid variable
