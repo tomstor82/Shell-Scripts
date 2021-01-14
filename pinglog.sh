@@ -47,7 +47,7 @@ s/m/h for respectively seconds, minutes and hours.\n
 	exit 0;
 elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]
 then
-	tail -f $LOGFILE;
+	less +F $LOGFILE;
 	exit 0;
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]
 then
