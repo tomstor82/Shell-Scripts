@@ -13,9 +13,16 @@
 # Features to be considered
 # 1. Multiple Destination Arguments
 # 2. Verbose and silent mode * use loop to iterate over arguments $@
+# 3. Log file for process ID's to enable a pinglog -kill command
 
 # ********** Investigate if script can be run simultaneously without causing error to file writing *************
 # sigaction(2) - to handle CTRL-C command and killing proccesses left behind
+#
+# As there appears to be a bug in the terminal handling the "SIGQUIT" signal, I've decided to start and stop a "quiet" ping session at set intervals,
+# and start a new ping process. This to allow for proper summary logging.
+
+# Add pinglog Process ID to file
+#echo "$!" >> ~/scripts/.pinglog.pid;
 
 # Default logfile location and name
 LOGFILE=~/ping.log;
@@ -28,18 +35,32 @@ if [[ $1 == '-h' ]] || [[ $1 == '--help' ]]
 then
 	printf '\npinglog logs statistics at specified time interval to external file,
 and can display alternative traceroute isolated IPs.\n
-usage: pinglog [-h] [--help] [-l] [--log] [ip/host...] [-r] [--route] [interval] [-s] [--silent] \n
+usage: pinglog [-h] [--help] [-l] [--log] [stop] [--stop] [ip/host...] [-r] [--route] [interval] \n
 default logfile is ~/ping.log (can be changed in script line 21).\n
 Valid arguments for IP is IPv4, IPv6 and hostname.
 Valid arguments for time are digits followed by denominator.
 s/m/h for respectively seconds, minutes and hours.\n
 	Example 1: pinglog 9.9.9.9 1.5h
 	Example 2: pinglog yahoo.com -r;
-	Example 3: pinglog --log\n';
+	Example 3: pinglog --log;
+	Example 4: pinglog stop\n';
 	exit 0;
 elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]
 then
 	tail -f $LOGFILE;
+	exit 0;
+elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]
+then
+	printf "Stopping all pinglog services\n";
+	pkill ping;
+	#until [[ $remPID == 0 ]]
+	#do
+	#	killid=$(sed -n '1p' ~/scripts/.pinglog.pid);
+	#	# remove first line from file as we've killed the process with that ID
+ 	#	sed -i '1,1d' ~/scripts/.pinglog.pid
+	#	# check how many lines in file are left
+	#	remPID=$(wc -l ~/scripts/.pinglog.pid | grep -Po '\d+');
+	#done;
 	exit 0;
 elif [ -z $1 ]
 then
@@ -62,13 +83,13 @@ else
 fi;
 
 # Search arguments for flags
-for flag in $@
-do
-	if [[ $flag == '-s' ]] || [[ $flag == '--silent' ]]
-	then
-		verbose=false;
-	fi;
-done;
+#for flag in $@
+#do
+#	if [[ $flag == '-s' ]] || [[ $flag == '--silent' ]]
+#	then
+#		verbose=false;
+#	fi;
+#done;
 
 # ************ Needs to be tested ******************
 # Switch statement
@@ -94,29 +115,42 @@ then
 	cat $LOGFILE > ${LOGFILE}.1;
 fi;
 
-# function for statistics and timestamp
+
+
 function pingStats() {
-	if [[ $verbose == false ]]
-	then
-		ping -O "$IP" 1> /dev/null 2>> "$LOGFILE" &
-	else
-		ping -O "$IP" 2>> "$LOGFILE" &
-	fi;
+	ping -q $IP 1>> $LOGFILE &
+	pid=$!;
+	until [ -z $pid ]
+	do
+		sleep ${SLEEP};
+		echo "" >> $LOGFILE &&\
+		echo '***************************************************************************' >> $LOGFILE &&\
+		date >> $LOGFILE &&\
+		kill -SIGINT "$pid";
+		pingStats;
+#	done;
+#}
+# function for statistics and timestamp
+#function pingStats() {
+#	if [[ $verbose == false ]]
+#	then
+#		ping -Oq "$IP" 2>> "$LOGFILE" &
+#	else
+##	fi;
 
 	# store process id to pid variable
-	pid=$!;
+#	pid=$!;
 	# declare command variable as non empty string to allow for loop to start
-	command="1";
+#	command="1";
 
 	# do loop until command variable length is Zero
-	until [ -z command ]
-	do
+#	until [ -z command ]
+#	do
 		# set interval
-		sleep "${SLEEP}";
+#		sleep "${SLEEP}";
 		# timestamp and send quit signal to trigger ping status
-		echo "Destination $IP on $(date)" >> $LOGFILE &&\
-		sleep 2;
-		kill -SIGQUIT "$pid";
+#		kill -SIGQUIT $pid &&\
+#		echo "Destination $IP on $(date)" >> $LOGFILE;
 		# delete first two lines of log when exceeding set log size
 		if [[ $logLines -gt $LOGSIZE ]]
 		then
@@ -127,7 +161,7 @@ function pingStats() {
 		# update command variable
 		command=$(ps "$pid" | grep -o ping);
 	done;
-	tail -f $LOGFILE;
+	#tail -f $LOGFILE;
 }
 
 # Notification of logfile
