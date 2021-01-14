@@ -52,7 +52,7 @@ then
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]
 then
 	printf "Stopping all pinglog services\n";
-	pkill ping;
+	pkill pinglog.sh;
 	#until [[ $remPID == 0 ]]
 	#do
 	#	killid=$(sed -n '1p' ~/scripts/.pinglog.pid);
