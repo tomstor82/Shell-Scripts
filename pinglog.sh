@@ -52,15 +52,19 @@ then
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]
 then
 	printf "Stopping all pinglog services\n";
+	until [[ $remPID == 0 ]]
+	do
+		# Read PID from line 1 of file
+		kID=$(sed -n '1p' ~/scripts/.ping.pid);
+		# Kill Process
+		kill "$kID";
+		# Remove first line from file as we've killed the process now
+ 		sed -i '1,1d' ~/scripts/.ping.pid
+		# Check how many lines file now contains
+		remPID=$(wc -l ~/scripts/.ping.pid | grep -Po '\d+');
+	done;
+	# Kill pinglog processes
 	pkill pinglog.sh;
-	#until [[ $remPID == 0 ]]
-	#do
-	#	killid=$(sed -n '1p' ~/scripts/.pinglog.pid);
-	#	# remove first line from file as we've killed the process with that ID
- 	#	sed -i '1,1d' ~/scripts/.pinglog.pid
-	#	# check how many lines in file are left
-	#	remPID=$(wc -l ~/scripts/.pinglog.pid | grep -Po '\d+');
-	#done;
 	exit 0;
 elif [ -z $1 ]
 then
@@ -73,6 +77,7 @@ fi;
 if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]
 then
 	traceroute $IP | grep -Po '\(\d+\.\d+\.\d+\.\d+\)' | grep -v "$IP" | grep -Po '\d+\.\d+\.\d+\.\d+';
+	# Windows Version /mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po '\d+\.\d+\.\d+\.\d+';
 	exit;
 elif [ -z $2 ]
 then
@@ -120,6 +125,8 @@ fi;
 function pingStats() {
 	ping -q $IP 1>> $LOGFILE &
 	pid=$!;
+	# Store ping process id to file for termination command
+	echo $pid >> ~/scripts/.ping.pid;
 	until [ -z $pid ]
 	do
 		sleep ${SLEEP};
