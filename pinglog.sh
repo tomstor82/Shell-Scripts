@@ -15,16 +15,16 @@ LOGSIZE=100;
 
 # Exit errors
 function err0() {
-	printf '\npinglog logs statistics at specified time interval to external file,
-and can display alternative traceroute isolated IPs.\n
-usage: pinglog [-h] [--help] [-l] [--log] [stop] [--stop] [ip/host...] [-r] [--route] [interval] \n
+	printf '\nPinglog logs statistics at specified time interval to external file,
+and can display alternative traceroute isolated IP addresses.\n
+usage: pinglog [-h] [--help] [-l] [--log] [stop] [--stop] [ip/host] [-r] [--route] [interval] \n
 default logfile is ~/ping.log (can be changed in script line 11).\n
-Valid arguments for IP is IPv4, IPv6 and hostname.
-Valid arguments for time are digits followed by denominator.
+Valid arguments for IP is IPv4, IPv6 or hostname.
+Valid arguments for time are digits with or without dot separator, followed by denominator.
 s/m/h for respectively seconds, minutes and hours.\n
 	Example 1: pinglog 9.9.9.9 1.5h
-	Example 2: pinglog yahoo.com -r;
-	Example 3: pinglog --log;
+	Example 2: pinglog yahoo.com -r
+	Example 3: pinglog --log
 	Example 4: pinglog stop\n';
 	exit 0;
 }
