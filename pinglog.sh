@@ -54,7 +54,7 @@ elif [[ $1 == 'status' ]]; then
 	if [[ -z $(ps -A | grep -o 'pinglog.sh') ]]; then
 		printf "Service not running\n";
 	else
-		printf "Services running. Use 'pinglog stop' to terminate\n";
+		printf "Services running. Use 'pinglog stop' to terminate\n"; # THIS APPEARS ALL THE TIME
 	exit 0;
 	fi;
 	
