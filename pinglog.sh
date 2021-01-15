@@ -50,6 +50,7 @@ then
 elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]
 then
 	less +F $LOGFILE;
+	exit 0;
 
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]
 then
