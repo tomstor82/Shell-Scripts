@@ -4,25 +4,8 @@
 #
 # Written by Tom Storebø 27/12/2020
 #
-# Two arguments are required
-#
-# First argument is the address to ping
-# Second argument is the time interval in minutes for sending statistics to external log file
-#
-
-# Features to be considered
-# 1. Multiple Destination Arguments
-# 2. Verbose and silent mode * use loop to iterate over arguments $@
-# 3. Log file for process ID's to enable a pinglog -kill command
-
-# ********** Investigate if script can be run simultaneously without causing error to file writing *************
-# sigaction(2) - to handle CTRL-C command and killing proccesses left behind
-#
 # As there appears to be a bug in the terminal handling the "SIGQUIT" signal, I've decided to start and stop a "quiet" ping session at set intervals,
 # and start a new ping process. This to allow for proper summary logging.
-
-# Add pinglog Process ID to file
-#echo "$!" >> ~/scripts/.pinglog.pid;
 
 # Default logfile location and name
 LOGFILE=~/ping.log;
@@ -35,7 +18,7 @@ function err0() {
 	printf '\npinglog logs statistics at specified time interval to external file,
 and can display alternative traceroute isolated IPs.\n
 usage: pinglog [-h] [--help] [-l] [--log] [stop] [--stop] [ip/host...] [-r] [--route] [interval] \n
-default logfile is ~/ping.log (can be changed in script line 21).\n
+default logfile is ~/ping.log (can be changed in script line 11).\n
 Valid arguments for IP is IPv4, IPv6 and hostname.
 Valid arguments for time are digits followed by denominator.
 s/m/h for respectively seconds, minutes and hours.\n
@@ -76,7 +59,7 @@ then
 		# Read PID from line 1 of file
 		kID=$(sed -n '1p' ~/scripts/.ping.pid);
 		# Kill Process
-		kill "$kID";
+		kill "$kID" 2> /dev/null;
 		# Remove first line from file as we've killed the process now
  		sed -i '1,1d' ~/scripts/.ping.pid
 		# Check how many lines file now contains
@@ -109,7 +92,7 @@ elif [ -z $2 ] # Missing argument
 then
 	err1;
 
-elif [[ $2 =~ ^[0-9]+[smh]$ ]]
+elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smh]$ ]]
 then
 	SLEEP=$2;
 
