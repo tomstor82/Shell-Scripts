@@ -17,7 +17,7 @@ LOGSIZE=100;
 function err0() {
 	printf '\nPinglog logs statistics at specified time interval to external file,
 and can display alternative traceroute isolated IP addresses.\n
-usage: pinglog [-h] [--help] [-l] [--log] [stop] [--stop] [ip/host] [-r] [--route] [interval] \n
+usage: pinglog [-h] [--help] [-l] [--log] [status] [stop] [--stop] [ip/host] [-r] [--route] [interval] \n
 default logfile is ~/ping.log (can be changed in script line 11).\n
 Valid arguments for IP is IPv4, IPv6 or hostname.
 Valid arguments for time are digits with or without dot separator, followed by denominator.
@@ -43,17 +43,21 @@ function err3() {
 
 # First argument variable
 
-if [[ $1 == '-h' ]] || [[ $1 == '--help' ]]
-then
+if [[ $1 == '-h' ]] || [[ $1 == '--help' ]]; then
 	err0;
 
-elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]
-then
+elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]; then
 	less +F $LOGFILE;
 	exit 0;
 
-elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]
-then
+elif [[ $1 == 'status' ]]; then
+	if [[ -z $(ps -A | grep -o 'pinglog.sh') ]]; then
+		printf "Service not running";
+	else
+		printf "Services running. Use 'pinglog stop' to terminate";
+	exit 0;
+	
+elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]; then
 	printf "Stopping all pinglog services\n";
 	until [[ $remPID == 0 ]]
 	do
@@ -69,12 +73,10 @@ then
 	# Kill pinglog processes
 	pkill pinglog.sh;
 
-elif [ -z $1 ] # Missing argument
-then
+elif [ -z $1 ]; then
 	err2;
 
-elif [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]
-then
+elif [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 	IP=$1;
 
 else
@@ -83,22 +85,18 @@ fi;
 
 # Second argument variable
 
-if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]
-then
-	if [[ -f /mnt/c/Windows/System32/TRACERT.exe ]]
-	then
+if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]; then
+	if [[ -f /mnt/c/Windows/System32/TRACERT.exe ]]; then
 		/mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po '\d+\.\d+\.\d+\.\d+';
 	else
 		traceroute $IP | grep -Po '\(\d+\.\d+\.\d+\.\d+\)' | grep -v "$IP" | grep -Po '\d+\.\d+\.\d+\.\d+';
 	fi;
 	exit;
 
-elif [ -z $2 ] # Missing argument
-then
+elif [ -z $2 ]; then
 	err1;
 
-elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smhSMH]$ ]]
-then
+elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smhSMH]$ ]]; then
 	SLEEP=$2;
 
 else
@@ -133,8 +131,7 @@ fi;
 
 
 # check if logfile has entries and if so backup
-if [ -n $LOGFILE ]
-then
+if [ -n $LOGFILE ]; then
 	cat $LOGFILE > ${LOGFILE}.1;
 fi;
 
@@ -177,8 +174,7 @@ function pingStats() {
 #		kill -SIGQUIT $pid &&\
 #		echo "Destination $IP on $(date)" >> $LOGFILE;
 		# delete first two lines of log when exceeding set log size
-		if [[ $logLines -gt $LOGSIZE ]]
-		then
+		if [[ $logLines -gt $LOGSIZE ]]; then
 			sed -i '1,2d' "$LOGFILE";
 		fi;
 		# update size of logfile
