@@ -85,7 +85,7 @@ fi;
 
 if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]
 then
-	if [[ ":$PATH:" == *":/mnt/c/Windows/System32/:"* ]];
+	if [[ -f /mnt/c/Windows/System32/TRACERT.exe ]]
 	then
 		/mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po '\d+\.\d+\.\d+\.\d+';
 	else
@@ -97,7 +97,7 @@ elif [ -z $2 ] # Missing argument
 then
 	err1;
 
-elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smh]$ ]]
+elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smhSMH]$ ]]
 then
 	SLEEP=$2;
 
