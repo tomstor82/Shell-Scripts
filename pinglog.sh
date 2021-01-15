@@ -25,19 +25,19 @@ s/m/h for respectively seconds, minutes and hours.\n
 	Example 1: pinglog 9.9.9.9 1.5h
 	Example 2: pinglog yahoo.com -r
 	Example 3: pinglog --log
-	Example 4: pinglog stop\n';
+	Example 4: pinglog stop\n\n';
 	exit 0;
 }
 function err1() {
-	printf "pinglog: Missing interval argument -- '1'\nTry 'pinglog --help' for more information.\n"
+	printf "\npinglog: Missing interval argument -- '1'\nTry 'pinglog --help' for more information.\n\n"
 	exit 1;
 }
 function err2() {
-	printf "pinglog: Missing destination argument -- '2'\nTry 'pinglog --help' for more information.\n"
+	printf "\npinglog: Missing destination argument -- '2'\nTry 'pinglog --help' for more information.\n\n"
 	exit 2;
 }
 function err3() {
-	printf "pinglog: Unknown arguments -- '3'\nTry 'pinglog --help' for more information.\n"
+	printf "\npinglog: Unknown arguments -- '3'\nTry 'pinglog --help' for more information.\n\n"
 	exit 3;
 }
 
@@ -51,12 +51,15 @@ elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]; then
 	exit 0;
 
 elif [[ $1 == 'status' ]]; then
-	if [[ $(ps -A | grep -o 'pinglog.sh') ]]; then
-		printf "Services running. Use 'pinglog stop' to terminate\n"; # THIS APPEARS ALL THE TIME
+# ==================================== BUG#01 ========================================= #
+#		"Services running" appears regardless of condition			#
+# ===================================================================================== #
+	if [[ $(ps -A | grep -o 'pinglog') ]]; then
+		printf "\nServices running. Use 'pinglog stop' to terminate\n\n"; # THIS APPEARS ALL THE TIME
 	else
-		printf "Service not running\n";
-	exit 0;
+		printf "\nService not running\n\n";
 	fi;
+	exit 0;
 	
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]; then
 	printf "Stopping all pinglog services\n";
@@ -191,7 +194,7 @@ function pingStats() {
 echo "Ping summary stored in file $LOGFILE";
 
 # Running script
-pingStats &amp;
+pingStats;
 #if [[ $verbose == true ]]
 #then
 #	ping -O "$IP" 2>> "$LOGFILE" & pingStats;	
