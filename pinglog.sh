@@ -85,8 +85,12 @@ fi;
 
 if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]
 then
-	traceroute $IP | grep -Po '\(\d+\.\d+\.\d+\.\d+\)' | grep -v "$IP" | grep -Po '\d+\.\d+\.\d+\.\d+';
-	# Windows Version /mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po '\d+\.\d+\.\d+\.\d+';
+	if [[ ":$PATH:" == *":/mnt/c/Windows/System32/:"* ]];
+	then
+		/mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po '\d+\.\d+\.\d+\.\d+';
+	else
+		traceroute $IP | grep -Po '\(\d+\.\d+\.\d+\.\d+\)' | grep -v "$IP" | grep -Po '\d+\.\d+\.\d+\.\d+';
+	fi;
 	exit;
 
 elif [ -z $2 ] # Missing argument
