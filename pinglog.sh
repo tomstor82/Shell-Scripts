@@ -52,10 +52,11 @@ elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]; then
 
 elif [[ $1 == 'status' ]]; then
 	if [[ -z $(ps -A | grep -o 'pinglog.sh') ]]; then
-		printf "Service not running";
+		printf "Service not running\n";
 	else
-		printf "Services running. Use 'pinglog stop' to terminate";
+		printf "Services running. Use 'pinglog stop' to terminate\n";
 	exit 0;
+	fi;
 	
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]; then
 	printf "Stopping all pinglog services\n";
