@@ -41,7 +41,7 @@ function err3() {
 	exit 3;
 }
 
-# First argument variable
+# First argument
 
 if [[ $1 == '-h' ]] || [[ $1 == '--help' ]]; then
 	err0;
@@ -51,10 +51,10 @@ elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]; then
 	exit 0;
 
 elif [[ $1 == 'status' ]]; then
-	if [[ -z $(ps -A | grep -o 'pinglog.sh') ]]; then
-		printf "Service not running\n";
-	else
+	if [[ $(ps -A | grep -o 'pinglog.sh') ]]; then
 		printf "Services running. Use 'pinglog stop' to terminate\n"; # THIS APPEARS ALL THE TIME
+	else
+		printf "Service not running\n";
 	exit 0;
 	fi;
 	
@@ -84,9 +84,10 @@ else
 	err3;
 fi;
 
-# Second argument variable
+# Second argument
 
 if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]; then
+	# If windows machine
 	if [[ -f /mnt/c/Windows/System32/TRACERT.exe ]]; then
 		/mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po '\d+\.\d+\.\d+\.\d+';
 	else
@@ -190,7 +191,7 @@ function pingStats() {
 echo "Ping summary stored in file $LOGFILE";
 
 # Running script
-pingStats;
+pingStats &amp;
 #if [[ $verbose == true ]]
 #then
 #	ping -O "$IP" 2>> "$LOGFILE" & pingStats;	
