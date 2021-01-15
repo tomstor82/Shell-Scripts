@@ -30,9 +30,8 @@ LOGFILE=~/ping.log;
 # Logfile size max lines
 LOGSIZE=100;
 
-# Check arguments
-if [[ $1 == '-h' ]] || [[ $1 == '--help' ]]
-then
+# Exit errors
+function err0() {
 	printf '\npinglog logs statistics at specified time interval to external file,
 and can display alternative traceroute isolated IPs.\n
 usage: pinglog [-h] [--help] [-l] [--log] [stop] [--stop] [ip/host...] [-r] [--route] [interval] \n
@@ -45,10 +44,30 @@ s/m/h for respectively seconds, minutes and hours.\n
 	Example 3: pinglog --log;
 	Example 4: pinglog stop\n';
 	exit 0;
+}
+function err1() {
+	printf "pinglog: Missing interval argument -- '1'\nTry 'pinglog --help' for more information.\n"
+	exit 1;
+}
+function err2() {
+	printf "pinglog: Missing destination argument -- '2'\nTry 'pinglog --help' for more information.\n"
+	exit 2;
+}
+function err3() {
+	printf "pinglog: Unknown arguments -- '3'\nTry 'pinglog --help' for more information.\n"
+	exit 3;
+}
+
+# First argument variable
+
+if [[ $1 == '-h' ]] || [[ $1 == '--help' ]]
+then
+	err0;
+
 elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]
 then
 	less +F $LOGFILE;
-	exit 0;
+
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]
 then
 	printf "Stopping all pinglog services\n";
@@ -65,26 +84,37 @@ then
 	done;
 	# Kill pinglog processes
 	pkill pinglog.sh;
-	exit 0;
-elif [ -z $1 ]
+
+elif [ -z $1 ] # Missing argument
 then
-	printf "pinglog: Missing destination argument -- '2'\nTry 'pinglog --help' for more information.\n"
-	exit 2;
-else
+	err2;
+
+elif [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]
+then
 	IP=$1;
+
+else
+	err3;
 fi;
+
+# Second argument variable
 
 if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]
 then
 	traceroute $IP | grep -Po '\(\d+\.\d+\.\d+\.\d+\)' | grep -v "$IP" | grep -Po '\d+\.\d+\.\d+\.\d+';
 	# Windows Version /mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po '\d+\.\d+\.\d+\.\d+';
 	exit;
-elif [ -z $2 ]
+
+elif [ -z $2 ] # Missing argument
 then
-	printf "pinglog: Missing interval argument -- '3'\nTry 'pinglog --help' for more information.\n"
-	exit 3;
-else
+	err1;
+
+elif [[ $2 =~ ^[0-9]+[smh]$ ]]
+then
 	SLEEP=$2;
+
+else
+	err3;
 fi;
 
 # Search arguments for flags
