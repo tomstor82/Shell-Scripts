@@ -51,15 +51,15 @@ elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]; then
 	exit 0;
 
 elif [[ $1 == 'status' ]]; then
-# ==================================== BUG#01 ========================================= #
-#		"Services running" appears regardless of condition			#
-# ===================================================================================== #
-	if [[ "$(ps -A | grep -o 'pinglog.sh')" ]]; then
+	test=($(ps -A | grep -o pinglog));
+	if [[ "${#test[@]}" > 2 ]]; then
+	#if [[ $(jobs pinglog.sh 2> /dev/null) ]]; then
 		printf "\nServices running. Use 'pinglog stop' to terminate\n\n"; # THIS APPEARS ALL THE TIME
+		exit 0;
 	else
 		printf "\nService not running\n\n";
+		exit 0;
 	fi;
-	exit 0;
 	
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]; then
 	printf "Stopping all pinglog services\n";
