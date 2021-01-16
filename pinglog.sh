@@ -11,7 +11,7 @@
 LOGFILE=~/ping.log;
 
 # Logfile size max lines
-LOGSIZE=100;
+LOGSIZE=500;
 
 # Exit errors
 function err0() {
@@ -137,6 +137,7 @@ fi;
 
 # check if logfile has entries and if so backup
 if [ -n $LOGFILE ]; then
+	cat ${LOGFILE}.1 > ${LOGFILE}.2;
 	cat $LOGFILE > ${LOGFILE}.1;
 fi;
 
