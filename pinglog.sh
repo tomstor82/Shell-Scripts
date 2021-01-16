@@ -55,7 +55,7 @@ elif [[ $1 == 'status' ]]; then
 #		"Services running" appears regardless of condition			#
 # ===================================================================================== #
 	stats=$(ps -A | grep -o 'pinglog');
-	if [[ -z $stats ]]; then
+	if [ $stats ]; then
 		printf "\nServices running. Use 'pinglog stop' to terminate\n\n"; # THIS APPEARS ALL THE TIME
 	else
 		printf "\nService not running\n\n";
