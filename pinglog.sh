@@ -126,22 +126,25 @@ function pingStats() {
 		echo '***************************************************************************' >> $LOGFILE &&\
 		date >> $LOGFILE &&\
 		kill -SIGINT "$pid";
-		pingStats;
 
 		# delete first two lines of log when exceeding set log size
 		if [[ $logLines -gt $LOGSIZE ]]; then
 			sed -i '1,2d' "$LOGFILE";
 		fi;
+
 		# update size of logfile
 		logLines=$(wc -l $LOGFILE | grep -Po '\d+');
+		
 		# update command variable
 		command=$(ps "$pid" | grep -o ping);
+		
+		# Call function again
+		pingStats;
 	done;
-	#tail -f $LOGFILE;
 }
 
 # Notification of logfile
 echo "Ping summary stored in file $LOGFILE";
 
-# Call function
+# Make initial function call
 pingStats;
