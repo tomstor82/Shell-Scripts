@@ -47,7 +47,7 @@ if [[ $1 == '-h' ]] || [[ $1 == '--help' ]]; then
 	err0;
 
 elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]; then
-	less +F $LOGFILE;
+	tail -f $LOGFILE;
 	exit 0;
 
 elif [[ $1 == 'status' ]]; then
@@ -108,40 +108,11 @@ else
 	err3;
 fi;
 
-# Search arguments for flags
-#for flag in $@
-#do
-#	if [[ $flag == '-s' ]] || [[ $flag == '--silent' ]]
-#	then
-#		verbose=false;
-#	fi;
-#done;
-
-# ************ Needs to be tested ******************
-# Switch statement
-#for flag in $@
-#do
-#	case "$flag" in
-#	'-v') verbose=true;;
-#	'--verbose') verbose=true;;
-#	'-h') help=true;;
-#	'--help') help=true;;
-#	'-r') route=true;;
-#	'--route') route=true;;
-#	'-l') log=true;;
-#	'--log') log=true;;
-#	*) ;;
-#	esac;
-#done;
-
-
 # check if logfile has entries and if so backup
 if [ -n $LOGFILE ]; then
 	cat ${LOGFILE}.1 > ${LOGFILE}.2;
 	cat $LOGFILE > ${LOGFILE}.1;
 fi;
-
-
 
 function pingStats() {
 	ping -q $IP 1>> $LOGFILE &
@@ -156,29 +127,7 @@ function pingStats() {
 		date >> $LOGFILE &&\
 		kill -SIGINT "$pid";
 		pingStats;
-#	done;
-#}
-# function for statistics and timestamp
-#function pingStats() {
-#	if [[ $verbose == false ]]
-#	then
-#		ping -Oq "$IP" 2>> "$LOGFILE" &
-#	else
-##	fi;
 
-	# store process id to pid variable
-#	pid=$!;
-	# declare command variable as non empty string to allow for loop to start
-#	command="1";
-
-	# do loop until command variable length is Zero
-#	until [ -z command ]
-#	do
-		# set interval
-#		sleep "${SLEEP}";
-		# timestamp and send quit signal to trigger ping status
-#		kill -SIGQUIT $pid &&\
-#		echo "Destination $IP on $(date)" >> $LOGFILE;
 		# delete first two lines of log when exceeding set log size
 		if [[ $logLines -gt $LOGSIZE ]]; then
 			sed -i '1,2d' "$LOGFILE";
@@ -194,11 +143,5 @@ function pingStats() {
 # Notification of logfile
 echo "Ping summary stored in file $LOGFILE";
 
-# Running script
+# Call function
 pingStats;
-#if [[ $verbose == true ]]
-#then
-#	ping -O "$IP" 2>> "$LOGFILE" & pingStats;	
-#else
-#	ping -O "$IP" 1> /dev/null 2>> "$LOGFILE" & pingStats;
-#fi;
