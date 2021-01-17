@@ -54,7 +54,7 @@ elif [[ $1 == 'status' ]]; then
 	test=($(ps -A | grep -o pinglog));
 	if [[ "${#test[@]}" > 2 ]]; then
 	#if [[ $(jobs pinglog.sh 2> /dev/null) ]]; then
-		printf "\nServices running. Use 'pinglog stop' to terminate\n\n"; # THIS APPEARS ALL THE TIME
+		printf "\nServices running. Use 'pinglog stop' to terminate\n\n";
 		exit 0;
 	else
 		printf "\nService not running\n\n";
