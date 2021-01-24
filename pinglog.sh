@@ -51,8 +51,8 @@ elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]; then
 	exit 0;
 
 elif [[ $1 == 'status' ]]; then
-	test=($(ps -A | grep -o pinglog));
-	if [[ "${#test[@]}" > 2 ]]; then
+	PROC=($(ps -A | grep -o pinglog));
+	if [[ "${#PROC[@]}" > 2 ]]; then
 	#if [[ $(jobs pinglog.sh 2> /dev/null) ]]; then
 		printf "\nServices running. Use 'pinglog stop' to terminate\n\n";
 		exit 0;
@@ -63,24 +63,24 @@ elif [[ $1 == 'status' ]]; then
 	
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]; then
 	printf "Stopping all pinglog services\n";
-	until [[ $remPID == 0 ]]
-	do
+	#until [[ $remPID == 0 ]]
+	#do
 		# Read PID from line 1 of file
-		kID=$(sed -n '1p' ~/scripts/.ping.pid);
+	#	kID=$(sed -n '1p' ~/scripts/.ping.pid);
 		# Kill Process
-		kill "$kID" 2> /dev/null;
+	#	kill "$kID" 2> /dev/null;
 		# Remove first line from file as we've killed the process now
- 		sed -i '1,1d' ~/scripts/.ping.pid
+ 	#	sed -i '1,1d' ~/scripts/.ping.pid
 		# Check how many lines file now contains
-		remPID=$(wc -l ~/scripts/.ping.pid | grep -Po '\d+');
-	done;
+	#	remPID=$(wc -l ~/scripts/.ping.pid | grep -Po '\d+');
+	#done;
 	# Kill pinglog processes
 	pkill pinglog.sh;
 
 elif [ -z $1 ]; then
 	err2;
 
-elif [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+elif [[ $1 =~ ^([0-9]{1,3}\.){3,3}[0-9]{1,3}$ ]]; then
 	IP=$1;
 
 else
@@ -92,9 +92,9 @@ fi;
 if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]; then
 	# If windows machine
 	if [[ -f /mnt/c/Windows/System32/TRACERT.exe ]]; then
-		/mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po '\d+\.\d+\.\d+\.\d+';
+		/mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po '([\d]{1,3}[\.]){3,3}[\d]{1,3}';
 	else
-		traceroute $IP | grep -Po '\(\d+\.\d+\.\d+\.\d+\)' | grep -v "$IP" | grep -Po '\d+\.\d+\.\d+\.\d+';
+		traceroute $IP | grep -Po '\(([\d]{1,3}[\.]){3,3}[\d]{1,3}\)' | grep -v "$IP" | grep -Po '([\d]{1,3}[\.]){3,3}[\d]{1,3}';
 	fi;
 	exit;
 # No argument received
@@ -103,8 +103,8 @@ elif [ -z $2 ]; then
 
 # Interval filtering
 elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smhSMH]$ ]]; then
-	DENOMINATOR=$(echo $2 | grep -Po "[a-zA-Z]");
-	VALUE=$(echo $2 | grep -Eo "[0-9]{1,}");
+	DENOMINATOR=$(echo $2 | grep -Poi "[a-z]");
+	VALUE=$(echo $2 | grep -Po "[\d]{1,}");
 	case $DENOMINATOR in
 		s)
 		COUNT=$VALUE
@@ -135,7 +135,7 @@ function pingStats() {
 		echo "" >> $LOGFILE &&\
 		echo '***************************************************************************' >> $LOGFILE &&\
 		date >> $LOGFILE &&\
-		ping -qO "$IP" -c "$COUNT" 1>> $LOGFILE;
+		ping -qO "$IP" -c "$COUNT" 1>> $LOGFILE &&
 
 		# delete first two lines of log when exceeding set log size
 		if [[ $logLines -gt $LOGSIZE ]]; then
