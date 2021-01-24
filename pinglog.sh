@@ -97,13 +97,28 @@ if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]; then
 		traceroute $IP | grep -Po '\(\d+\.\d+\.\d+\.\d+\)' | grep -v "$IP" | grep -Po '\d+\.\d+\.\d+\.\d+';
 	fi;
 	exit;
-
+# No argument received
 elif [ -z $2 ]; then
 	err1;
 
+# Interval filtering
 elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smhSMH]$ ]]; then
-	SLEEP=$2;
-
+	DENOMINATOR=$(echo $2 | grep -Po "[a-zA-Z]");
+	VALUE=$(echo $2 | grep -Eo "[0-9]{1,}");
+	case $DENOMINATOR in
+		s)
+		COUNT=$VALUE
+		;;
+		m)
+		COUNT=$(($VALUE * 60))
+		;;
+		h)
+		COUNT=$(($VALUE * 360))
+		;;
+		*)
+		err3
+		;;
+	esac
 else
 	err3;
 fi;
@@ -115,17 +130,12 @@ if [ -n $LOGFILE ]; then
 fi;
 
 function pingStats() {
-	ping -q $IP 1>> $LOGFILE &
-	pid=$!;
-	# Store ping process id to file for termination command
-	echo $pid >> ~/scripts/.ping.pid;
-	until [ -z $pid ]
+	while true
 	do
-		sleep ${SLEEP};
 		echo "" >> $LOGFILE &&\
 		echo '***************************************************************************' >> $LOGFILE &&\
 		date >> $LOGFILE &&\
-		kill -SIGINT "$pid";
+		ping -qO "$IP" -c "$COUNT" 1>> $LOGFILE;
 
 		# delete first two lines of log when exceeding set log size
 		if [[ $logLines -gt $LOGSIZE ]]; then
@@ -134,9 +144,6 @@ function pingStats() {
 
 		# update size of logfile
 		logLines=$(wc -l $LOGFILE | grep -Po '\d+');
-		
-		# update command variable
-		command=$(ps "$pid" | grep -o ping);
 		
 		# Call function again
 		pingStats;
