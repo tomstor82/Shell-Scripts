@@ -122,11 +122,11 @@ function pingStats() {
 	do
 		echo "" >> $LOGFILE &&\
 		echo '***************************************************************************' >> $LOGFILE &&\
-		date >> $LOGFILE &&\
-		ping -qc "$COUNT" "$IP" 1>> $LOGFILE &&
+		ping -qc "$COUNT" "$IP" 1>> $LOGFILE &&\
+		printf "\n$(date)\n" >> $LOGFILE;
 
 		# delete first two lines of log when exceeding set log size
-		if [[ $logLines -gt $LOGSIZE ]]; then
+		if [[ $logLines > $LOGSIZE ]]; then
 			sed -i '1,2d' "$LOGFILE";
 		fi;
 
