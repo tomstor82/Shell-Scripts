@@ -1,1 +1,3 @@
-This folder contains my shell scripts for various functions
+My Shell Scripts
+
+This folder contains various script for convenient automated tasks.
