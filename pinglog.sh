@@ -63,18 +63,6 @@ elif [[ $1 == 'status' ]]; then
 	
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]; then
 	printf "Stopping all pinglog services\n";
-	#until [[ $remPID == 0 ]]
-	#do
-		# Read PID from line 1 of file
-	#	kID=$(sed -n '1p' ~/scripts/.ping.pid);
-		# Kill Process
-	#	kill "$kID" 2> /dev/null;
-		# Remove first line from file as we've killed the process now
- 	#	sed -i '1,1d' ~/scripts/.ping.pid
-		# Check how many lines file now contains
-	#	remPID=$(wc -l ~/scripts/.ping.pid | grep -Po '\d+');
-	#done;
-	# Kill pinglog processes
 	pkill pinglog.sh;
 
 elif [ -z $1 ]; then
@@ -135,7 +123,7 @@ function pingStats() {
 		echo "" >> $LOGFILE &&\
 		echo '***************************************************************************' >> $LOGFILE &&\
 		date >> $LOGFILE &&\
-		ping -qO "$IP" -c "$COUNT" 1>> $LOGFILE &&
+		ping -qc "$COUNT" "$IP" 1>> $LOGFILE &&
 
 		# delete first two lines of log when exceeding set log size
 		if [[ $logLines -gt $LOGSIZE ]]; then
