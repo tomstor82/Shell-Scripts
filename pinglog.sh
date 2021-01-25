@@ -125,9 +125,9 @@ function pingStats() {
 		ping -qc "$COUNT" "$IP" 1>> $LOGFILE &&\
 		printf "\n$(date)\n" >> $LOGFILE;
 
-		# delete first two lines of log when exceeding set log size
+		# delete lines 1 through 9 of the log when exceeding set log size
 		if [[ $logLines > $LOGSIZE ]]; then
-			sed -i '1,2d' "$LOGFILE";
+			sed -i '1,9d' "$LOGFILE";
 		fi;
 
 		# update size of logfile
