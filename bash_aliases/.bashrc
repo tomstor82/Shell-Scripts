@@ -117,4 +117,7 @@ if ! shopt -oq posix; then
 fi
 
 # launch TMUX script for my Home session
-~/scripts/tmux-auto.sh
+/home/tom/scripts/tmux-auto.sh
+
+# SBIN path
+export PATH=$PATH:/usr/sbin/
