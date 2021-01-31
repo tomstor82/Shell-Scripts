@@ -35,8 +35,8 @@ alias vlcopen='DISPLAY=:0 vlc --fullscreen'
 # battery status
 alias bat='upower -d'
 # firefox start. To use a variables string value quotation marks has to be used. Otherwise only the first word will be used.
-alias fox='read -p "Type Firefox Search or leave blank: " input; firefox --new-tab --search "$input" &'
-alias kbc='firefox --new-tab "kbc.ie:443" &'
+alias fox='read -p "Type Firefox Search or leave blank: " input; DISPLAY=:0 firefox --new-tab --search "$input" &'
+alias kbc='DISPLAY=:0 firefox --new-tab "kbc.ie:443" &'
 alias netflix='DISPLAY=:0 firefox --new-tab "https://www.netflix.com/browse" &'
 alias spotify='DISPLAY=:0 firefox --new-tab "https://open.spotify.com/" &'
 # renew DHCP lease
