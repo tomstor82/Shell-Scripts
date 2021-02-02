@@ -132,7 +132,7 @@ function pingStats() {
 
 		# update size of logfile
 		logLines=$(wc -l $LOGFILE | grep -Po '\d+');
-		
+
 		# Call function again
 		pingStats;
 	done;
