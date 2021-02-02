@@ -1,0 +1,19 @@
+#!/bin/bash
+log=~/.streamKill.log;
+logSize=100;
+logLines=$(wc -l $log | grep -Po '\d+');
+# If Log Exceeds 100 lines reset
+if [[ $logLines > $logSize ]];then
+	echo "" > $log;
+fi;
+
+chromium=$(ps -A | grep chromium);
+kodi=$(ps -A | grep kodi);
+if [[ -n $kodi ]]; then
+	pkill kodi;
+	printf "$(date)\n$kodi\n\n" >> ~/.streamKill.log;
+fi;
+if [[ -n $chromium ]]; then
+	pkill chromium;
+	printf "$(date)\nÂ$chromium\n\n" >> ~/.streamKill.log
+fi;
