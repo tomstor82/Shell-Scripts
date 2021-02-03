@@ -7,6 +7,7 @@
 # As there appears to be a bug in the terminal handling the "SIGQUIT" signal, I've decided to start and stop a "quiet" ping session at set intervals,
 # and start a new ping process. This to allow for proper summary logging.
 
+# Prevents script from running if errors are present in code
 set -o errexit
 set -o nounset
 set -o pipefail
