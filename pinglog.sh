@@ -7,6 +7,10 @@
 # As there appears to be a bug in the terminal handling the "SIGQUIT" signal, I've decided to start and stop a "quiet" ping session at set intervals,
 # and start a new ping process. This to allow for proper summary logging.
 
+set -o errexit
+set -o nounset
+set -o pipefail
+
 # Default logfile location and name
 LOGFILE=~/ping.log;
 
@@ -117,6 +121,10 @@ if [ -n $LOGFILE ]; then
 	cat $LOGFILE > ${LOGFILE}.1;
 fi;
 
+function logLines() {
+	wc -l $LOGFILE | grep -Po '\d+';
+}
+
 function pingStats() {
 	while true
 	do
@@ -126,12 +134,12 @@ function pingStats() {
 		printf "\n$(date)\n" >> $LOGFILE;
 
 		# delete lines 1 through 9 of the log when exceeding set log size
-		if [[ $logLines -gt $LOGSIZE ]]; then
+		if [[ $(logLines) -gt $LOGSIZE ]]; then
 			sed -i '1,9d' "$LOGFILE";
 		fi;
 
 		# update size of logfile
-		logLines=$(wc -l $LOGFILE | grep -Po '\d+');
+		#logLines=$(wc -l $LOGFILE | grep -Po '\d+');
 
 		# Call function again
 		pingStats;
