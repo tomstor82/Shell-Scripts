@@ -52,7 +52,7 @@ elif [[ $1 == '-l' ]] || [[ $1 == '--log' ]]; then
 
 elif [[ $1 == 'status' ]]; then
 	PROC=($(ps -A | grep -o pinglog));
-	if [[ "${#PROC[@]}" > 2 ]]; then
+	if [[ "${#PROC[@]}" -gt 2 ]]; then
 	#if [[ $(jobs pinglog.sh 2> /dev/null) ]]; then
 		printf "\nServices running. Use 'pinglog stop' to terminate\n\n";
 		exit 0;
@@ -126,7 +126,7 @@ function pingStats() {
 		printf "\n$(date)\n" >> $LOGFILE;
 
 		# delete lines 1 through 9 of the log when exceeding set log size
-		if [[ $logLines > $LOGSIZE ]]; then
+		if [[ $logLines -gt $LOGSIZE ]]; then
 			sed -i '1,9d' "$LOGFILE";
 		fi;
 

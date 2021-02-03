@@ -3,7 +3,7 @@ log=~/.streamKill.log;
 logSize=100;
 logLines=$(wc -l $log | grep -Po '\d+');
 # If Log Exceeds 100 lines reset
-if [[ $logLines > $logSize ]];then
+if [[ $logLines -gt $logSize ]];then
 	echo "" > $log;
 fi;
 
