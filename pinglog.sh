@@ -81,13 +81,14 @@ else
 fi;
 
 # Second argument
+ipRegEx='([\d]{1,3}[\.]){3,3}[\d]{1,3}';
 
 if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]; then
 	# If windows machine
 	if [[ -f /mnt/c/Windows/System32/TRACERT.exe ]]; then
-		/mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po '([\d]{1,3}[\.]){3,3}[\d]{1,3}';
+		/mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po $ipRegEx;
 	else
-		traceroute $IP | grep -Po '\(([\d]{1,3}[\.]){3,3}[\d]{1,3}\)' | grep -v "$IP" | grep -Po '([\d]{1,3}[\.]){3,3}[\d]{1,3}';
+		traceroute $IP | grep -Po "\("$ipRegEx"\)" | grep -v "$IP" | grep -Po $ipRegEx;
 	fi;
 	exit;
 # No argument received
@@ -116,8 +117,12 @@ else
 	err3;
 fi;
 
-# check if logfile has entries and if so backup
-if [ -n $LOGFILE ]; then
+# create file if non existing
+touch $LOGFILE;
+# check if logfile has entries, if so back-up
+if [ -s $LOGFILE ]; then
+	# Create log 1 + 2 if they don't exist
+	touch ${LOGFILE}.1 && touch ${LOGFILE}.2;
 	cat ${LOGFILE}.1 > ${LOGFILE}.2;
 	cat $LOGFILE > ${LOGFILE}.1;
 fi;
