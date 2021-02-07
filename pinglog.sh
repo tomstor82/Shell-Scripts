@@ -9,7 +9,7 @@
 
 # Prevents script from running if errors are present in code
 set -o errexit
-set -o nounset
+#set -o nounset
 set -o pipefail
 
 # Default logfile location and name
