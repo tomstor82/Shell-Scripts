@@ -1,7 +1,7 @@
 # show current aliases
-alias als='cat .bash_aliases | grep -Poh "\s\w+[=]" | grep -Po "\w+[^=]"'
+alias als='cat ~/.bash_aliases | grep -Poh "\s\w+[=]" | grep -Po "\w+[^=]"'
 # sudo apt install shortcut
-alias sai='echo 4109 | sudo -S apt install'
+alias sai='echo 4109 | sudo -S apt install -y'
 # update and modify aliases
 alias upd='echo 4109 | sudo -S apt update && upgradable="sudo -S apt list --upgradable" && sudo -S apt -y upgrade && sudo -S apt -y autoremove && echo $upgradable | grep -Pho "^\w+[-]\w+[-]?(\w+)?"'
 alias ali='nano ~/.bash_aliases && source ~/.bash_aliases'
@@ -36,7 +36,7 @@ alias vlcopen='DISPLAY=:0 vlc --fullscreen'
 alias bat='upower -d'
 # firefox start. To use a variables string value quotation marks has to be used. Otherwise only the first word will be used.
 alias fox='read -p "Type Firefox Search or leave blank: " input; DISPLAY=:0 firefox --new-tab --search "$input" &'
-alias kbc='DISPLAY=:0 firefox --new-tab "kbc.ie:443" &'
+alias kbc='DISPLAY=:0 firefox --new-tab "https://online.kbc.ie/kbc-online/onlinebanking	" &'
 alias netflix='DISPLAY=:0 firefox --new-tab "https://www.netflix.com/browse" &'
 alias spotify='DISPLAY=:0 firefox --new-tab "https://open.spotify.com/" &'
 # renew DHCP lease
@@ -59,4 +59,8 @@ alias pinglog='~/scripts/pinglog.sh'
 # wireless network
 alias wifi='nmcli dev wifi';
 # convert mkv to mp4
-#alias convert_mkv='read -p "Type source file: " input; ffmpeg -i $input -codec copy $input | grep -Pv ".mkv".mp4'
+alias lhost='~/scripts/lhost.sh'
+# show wifi network details
+alias ssid='~/scripts/ssid.sh';
+# show compiler commands
+alias comp='cat ~/scripts/compilers.md';
