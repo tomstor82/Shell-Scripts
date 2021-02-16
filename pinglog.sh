@@ -136,7 +136,7 @@ function pingStats() {
 	do
 		echo "" >> $LOGFILE &&\
 		echo '***************************************************************************' >> $LOGFILE &&\
-		ping -qc "$COUNT" "$IP" 1>> $LOGFILE &&\
+		nohup ping -c "$COUNT" "$IP" 1>> $LOGFILE 2> /dev/null &&\
 		printf "\n$(date)\n" >> $LOGFILE;
 
 		# delete lines 1 through 9 of the log when exceeding set log size
