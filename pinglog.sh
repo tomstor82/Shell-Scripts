@@ -107,7 +107,7 @@ elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smhSMH]$ ]]; then
 		COUNT=$(($VALUE * 60))
 		;;
 		h)
-		COUNT=$(($VALUE * 360))
+		COUNT=$(($VALUE * 3600))
 		;;
 		*)
 		err3
