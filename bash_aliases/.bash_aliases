@@ -64,3 +64,5 @@ alias lhost='~/scripts/lhost.sh'
 alias ssid='~/scripts/ssid.sh';
 # show compiler commands
 alias comp='cat ~/scripts/compilers.md';
+# macOS open command
+function open() { nautilus ${1} & };
