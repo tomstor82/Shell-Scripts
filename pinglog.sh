@@ -135,7 +135,7 @@ function pingStats() {
 	while true
 	do
 		echo "" >> $LOGFILE &&\
-		echo '***************************************************************************' >> $LOGFILE &&\
+		echo '************************************************************************	***' >> $LOGFILE &&\
 		nohup ping -qc "$COUNT" "$IP" 1>> $LOGFILE 2> /dev/null &&\
 		printf "\n$(date)\n" >> $LOGFILE;
 
