@@ -134,9 +134,9 @@ function logLines() {
 function pingStats() {
 	while true
 	do
-		nohup ping -qc "$COUNT" "$IP" 1>> $LOGFILE 2> /dev/null &&\
+		nohup ping -qc "$COUNT" "$IP" 2> temp | grep -Poz '(?s)[-]{3}\ ([\d]{1,3}\.){3}[\d]{1,3}\ ping\ statistics\ [-]{3}.[\d]+([.][\d]+)?\ packets.+\ loss' >> $LOGFILE;
+		#1>> $LOGFILE 2> /dev/null &&\
 		printf "\n$(date)\n" >> $LOGFILE;
-		echo '***************************************************************************' >> $LOGFILE &&\
 		echo "" >> $LOGFILE &&\
 
 		# delete lines 1 through 9 of the log when exceeding set log size
