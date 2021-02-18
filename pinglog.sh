@@ -135,13 +135,9 @@ function pingStats() {
 	while true
 	do
 		nohup ping -qc "$COUNT" "$IP" 2> temp | grep -Poz '(?s)[-]{3}\ ([\d]{1,3}\.){3}[\d]{1,3}\ ping\ statistics\ [-]{3}.[\d]+([.][\d]+)?\ packets.+\ loss' >> $LOGFILE;
-		# start new line
-		printf "\n" >> $LOGFILE;
-		# add time stamp
-		printf "$(date)\n" >> $LOGFILE;
-		# add empty line
-		echo "" >> $LOGFILE;
-
+		# start new line, add time stamp and empty line
+		printf "\n$(date)\n\n" >> $LOGFILE;
+		
 		# delete lines 1 through 9 of the log when exceeding set log size
 		if [[ $(logLines) -gt $LOGSIZE ]]; then
 			sed -i '1,9d' "$LOGFILE";
