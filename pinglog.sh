@@ -92,29 +92,29 @@ if [[ $2 == '-r' ]] || [[ $2 == '--route' ]]; then
 	fi;
 	exit;
 # No argument received
-elif [ -z $2 ]; then
-	err1;
+#elif [ -z $2 ]; then
+#	err1;
 
 # Interval filtering
-elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smhSMH]$ ]]; then
-	DENOMINATOR=$(echo $2 | grep -Poi "[a-z]");
-	VALUE=$(echo $2 | grep -Po "[\d]{1,}");
-	case $DENOMINATOR in
-		s)
-		COUNT=$VALUE
-		;;
-		m)
-		COUNT=$(($VALUE * 60))
-		;;
-		h)
-		COUNT=$(($VALUE * 3600))
-		;;
-		*)
-		err3
-		;;
-	esac
-else
-	err3;
+#elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smhSMH]$ ]]; then
+#	DENOMINATOR=$(echo $2 | grep -Poi "[a-z]");
+#	VALUE=$(echo $2 | grep -Po "[\d]{1,}");
+#	case $DENOMINATOR in
+#		s)
+#		COUNT=$VALUE
+#		;;
+#		m)
+#		COUNT=$(($VALUE * 60))
+#		;;
+#		h)
+#		COUNT=$(($VALUE * 3600))
+#		;;
+#		*)
+#		err3
+#		;;
+#	esac
+#else
+#	err3;
 fi;
 
 # create file if non existing
@@ -132,21 +132,20 @@ function logLines() {
 }
 
 function pingStats() {
-	while true
-	do
-		nohup ping -qc "$COUNT" "$IP" 2> /dev/null | grep -Poz '(?s)[-]{3}\ ([\d]{1,3}\.){3}[\d]{1,3}\ ping\ statistics\ [-]{3}.[\d]+([.][\d]+)?\ packets.+\ loss' >> $LOGFILE && printf "\n$(date)\n\n" >> $LOGFILE;
-		
+	ping -O $IP | while read png; do echo "Pinging $IP $(date): $png"; done | grep -Po '.+no\ answer.+' >> $LOGFILE && printf "\n\n" >> $LOGFILE;
+	#while true
+	#do
 		# delete lines 1 through 9 of the log when exceeding set log size
-		if [[ $(logLines) -gt $LOGSIZE ]]; then
-			sed -i '1,9d' "$LOGFILE";
-		fi;
+	#	if [[ $(logLines) -gt $LOGSIZE ]]; then
+	#		sed -i '1,9d' "$LOGFILE";
+	#	fi;
 
 		# update size of logfile
 		#logLines=$(wc -l $LOGFILE | grep -Po '\d+');
 
 		# Call function again
-		pingStats;
-	done;
+	#	pingStats;
+	#done;
 }
 
 # Notification of logfile
