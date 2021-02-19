@@ -131,25 +131,22 @@ function logLines() {
 	wc -l $LOGFILE | grep -Po '\d+';
 }
 
-function pingStats() {
-	ping -O $IP | while read png; do echo "Pinging $IP $(date): $png"; done | grep -Po '.+no\ answer.+' >> $LOGFILE && printf "\n\n" >> $LOGFILE;
-	#while true
-	#do
-		# delete lines 1 through 9 of the log when exceeding set log size
-	#	if [[ $(logLines) -gt $LOGSIZE ]]; then
-	#		sed -i '1,9d' "$LOGFILE";
-	#	fi;
-
-		# update size of logfile
-		#logLines=$(wc -l $LOGFILE | grep -Po '\d+');
-
-		# Call function again
-	#	pingStats;
-	#done;
+function maintainLog() {
+	while true
+	do
+		sleep 1;
+		# delete first line the log when exceeding set log size
+		if [[ $(logLines) -gt $LOGSIZE ]]; then
+			sed -i '1' "$LOGFILE";
+		fi;
+	done;
 }
+
+
 
 # Notification of logfile
 echo "Ping summary stored in file $LOGFILE";
 
 # Make initial function call
-pingStats;
+maintainLog &
+ping -O $IP | while read png; do echo ">> Ping $IP << $(date): $png"; done | grep -Po '.+no\ answer.+' >> $LOGFILE # && printf " lost 1 packet\n\n" >> $LOGFILE;
