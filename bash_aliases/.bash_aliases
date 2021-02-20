@@ -3,7 +3,7 @@ alias als='cat ~/.bash_aliases | grep -Poh "\s\w+[=]" | grep -Po "\w+[^=]"'
 # sudo apt install shortcut
 alias sai='echo 4109 | sudo -S apt install -y'
 # update and modify aliases
-alias upd='echo 4109 | sudo -S apt update; upgradable="$(apt list --upgradable 2> /dev/null)"; sleep 1; sudo -S apt -y upgrade; sudo -S apt -y autoremove; echo $upgradable | grep -Pho "^\w+[-]\w+[-]?(\w+)?"'
+alias upd='echo 4109 | sudo -S apt update; upgradable=$(apt list --upgradable 2> /dev/null); sleep 1; sudo -S apt -y upgrade; sudo -S apt -y autoremove; echo $upgradable | grep -Pho "^\w+[-]\w+[-]?(\w+)?"';
 alias ali='nano ~/.bash_aliases && source ~/.bash_aliases'
 # fast reboot
 alias reb="echo 4109 | sudo -S reboot 0"
