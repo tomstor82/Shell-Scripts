@@ -147,7 +147,7 @@ function summary() {
 	while true
 	do
 		sleep 3600;
-		printf "\n>> Ping $IP Hourly Summary << $(date): $summary\n" >> $LOGFILE;
+		printf "\n>> Ping $IP Hourly Summary << $(date)\n" >> $LOGFILE;
 		kill -SIGQUIT $(ps -fC ping | grep $IP | awk '{print $2}');
 	done;
 }
