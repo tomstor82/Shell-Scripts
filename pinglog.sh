@@ -134,19 +134,27 @@ function logLines() {
 function maintainLog() {
 	while true
 	do
-		sleep 1;
-		# delete first line the log when exceeding set log size
+		sleep 60;
+		# delete first lines every minute, when log exceedes set size
 		if [[ $(logLines) -gt $LOGSIZE ]]; then
-			sed -i '1' "$LOGFILE";
+			deleteLines=$(($(logLines)-$LOGSIZE));
+			sed -i "1,${deleteLines}d" "$LOGFILE";
 		fi;
 	done;
 }
 
-
+function summary() {
+	while true
+	do
+		sleep 3600;
+		printf "\n>> Ping $IP Hourly Summary << $(date): $summary\n" >> $LOGFILE;
+		kill -SIGQUIT $(ps -fC ping | grep $IP | awk '{print $2}');
+	done;
+}
 
 # Notification of logfile
 echo "Ping summary stored in file $LOGFILE";
 
 # Make initial function call
-maintainLog &
-ping -O $IP | while read png; do echo ">> Ping $IP << $(date): $png"; done | grep -Po '.+no\ answer.+' >> $LOGFILE;
+maintainLog & summary &
+ping -O $IP 2>> $LOGFILE | while read png; do echo ">> Ping $IP << $(date): $png"; done | grep -Po '(.+no\ answer.+)||(^[\d]{1}.+ms$)' >> $LOGFILE;
