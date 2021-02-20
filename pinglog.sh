@@ -65,7 +65,7 @@ elif [[ $1 == 'status' ]]; then
 		printf "\nService not running\n\n";
 		exit 0;
 	fi;
-	
+
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]; then
 	printf "Stopping all pinglog services\n";
 	pkill pinglog.sh;
@@ -149,4 +149,4 @@ echo "Ping summary stored in file $LOGFILE";
 
 # Make initial function call
 maintainLog &
-ping -O $IP | while read png; do echo ">> Ping $IP << $(date): $png"; done | grep -Po '.+no\ answer.+' >> $LOGFILE # && printf " lost 1 packet\n\n" >> $LOGFILE;
+ping -O $IP | while read png; do echo ">> Ping $IP << $(date): $png"; done | grep -Po '.+no\ answer.+' >> $LOGFILE;
