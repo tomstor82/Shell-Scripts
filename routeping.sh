@@ -43,7 +43,10 @@ function err3() {
 	printf "\nrouteping: Unknown arguments -- '3'\nTry 'routeping --help' for more information.\n\n"
 	exit 3;
 }
-
+function killService() {
+	printf "Stopping all routeping services\n";
+	pkill ping;
+}
 # First argument
 
 if [[ $1 == '-h' ]] || [[ $1 == '--help' ]]; then
@@ -64,7 +67,7 @@ elif [[ $1 == 'status' ]]; then
 	fi;
 
 elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]; then
-	printf "Stopping all routeping services\n";
+	killService;
 	pkill routeping.sh;
 
 elif [ -z $1 ]; then
@@ -82,7 +85,7 @@ ipRegEx='([\d]{1,3}[\.]){3,3}[\d]{1,3}';
 
 # No argument received set 1hr interval
 if [ -z $2 ]; then
-	COUNT=3600;
+	interval=3600;
 
 # Interval filtering
 elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smhSMH]$ ]]; then
@@ -90,13 +93,13 @@ elif [[ $2 =~ ^[0-9]+\.?[0-9]?[smhSMH]$ ]]; then
 	VALUE=$(echo $2 | grep -Po "[\d]{1,}");
 	case $DENOMINATOR in
 		s)
-		COUNT=$VALUE
+		interval=$VALUE
 		;;
 		m)
-		COUNT=$(($VALUE * 60))
+		interval=$(($VALUE * 60))
 		;;
 		h)
-		COUNT=$(($VALUE * 3600))
+		interval=$(($VALUE * 3600))
 		;;
 		*)
 		err3
@@ -106,8 +109,22 @@ else
 	err3;
 fi;
 
+# ****************
+ipRegEx='([\d]{1,3}[\.]){3,3}[\d]{1,3}';
+
+# If windows machine
+function traceGrep() {
+	if [[ -f /mnt/c/Windows/System32/TRACERT.exe ]]; then
+		/mnt/c/Windows/System32/TRACERT.exe $IP | grep -Po $ipRegEx;
+	else
+		traceroute $IP | grep -Po "\("$ipRegEx"\)" | grep -v "$IP" | grep -Po $ipRegEx;
+	fi;
+}
 # Creating route array
-arr=($(pinglog $IP -r));
+arr=($(traceGrep));
+
+# debug
+#for i in "${arr[@]}"; do echo $i; done;
 
 # create file if non existing
 touch $LOGFILE;
@@ -126,7 +143,7 @@ function logLines() {
 function maintainLog() {
 	while true
 	do
-		sleep $COUNT;
+		sleep 60;
 		# delete first lines every minute, when log exceedes set size
 		if [[ $(logLines) -gt $LOGSIZE ]]; then
 			deleteLines=$(($(logLines)-$LOGSIZE));
@@ -136,14 +153,13 @@ function maintainLog() {
 }
 
 function summary() {
-	while true
-	do
-		sleep 20;
-		for i in "${arr[@]}"
-		do
-			:
-			printf "\n>> Ping ${arr[i]} Hourly Summary << $(date | awk '{print $2,$3,$4}')\n" >> $LOGFILE;
-			kill -SIGQUIT $(ps -fC ping | grep ${arr[i]} | awk '{print $2}');
+	while [[ -n ${arr[@]} ]]; do
+		sleep $interval;
+		for i in "${arr[@]}"; do
+			sleep 0.1;
+			echo "" >> $LOGFILE;
+			echo "*** $i $(date | awk '{print $2,$3,$4}') ***" >> $LOGFILE;
+			kill -SIGQUIT $(ps -fC ping | grep $i | awk '{print $2}');
 		done;
 	done;
 }
@@ -151,11 +167,10 @@ function summary() {
 # Notification of logfile
 echo "Ping summary stored in file $LOGFILE";
 
-# Make initial function call
+# Call log and summary functions and kill previous service
 maintainLog & summary &
-# creating ping loop
-for i in "${arr[@]}"
+# start pings to all route IPs
+for i in "${arr[@]}";
 do
-	:
-	ping -q ${arr[i]} 2>> $LOGFILE &
+	ping -q $i 1> /dev/null 2>> $LOGFILE &
 done;
