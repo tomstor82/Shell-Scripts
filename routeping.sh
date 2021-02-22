@@ -19,8 +19,8 @@ LOGSIZE=500;
 # Exit errors
 function err0() {
 	printf '\nRouteping logs ping statistics along the route to specified destination at user specified intervals.\n
-	Default time interval is hourly, if no user argument is passed.\n
-usage: routeping [-h] [--help] [-l] [--log] [status] [stop] [--stop] [ip,host] [interval] \n
+Default destination is 8.8.8.8 and time interval hourly, if no user arguments are passed.\n
+usage: routeping [-h,--help] [status] [stop,--stop] [ip,host] [interval] \n
 default logfile is ~/routeping.log (can be changed in script line 14).\n
 Valid arguments for IP is IPv4, IPv6 or hostname.
 Valid arguments for time are digits with or without dot separator, followed by denominator.
@@ -28,7 +28,7 @@ s/m/h for respectively seconds, minutes and hours.\n
 	Example 1: routeping 9.9.9.9 1.5h
 	Example 2: routeping yahoo.com
 	Example 3: routeping status
-	Example 4: routeping stop';
+	Example 4: routeping stop\n\n';
 	exit 0;
 }
 function err1() {
