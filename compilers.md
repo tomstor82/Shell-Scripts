@@ -12,6 +12,7 @@ node-sass <filename.scss> <output filename.css>
 /* Install babel and react presets in local folder */
 
 npx install --save-dev @babel/core @babel/cli @babel/preset-react
+
 /* Compile */
 
 npx babel --presets @babel/preset-react <filename.jsx> -o <output filename.js>
