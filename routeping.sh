@@ -71,7 +71,7 @@ elif [[ $1 == 'stop' ]] || [[ $1 == '--stop' ]]; then
 	pkill routeping.sh;
 
 elif [ -z $1 ]; then
-	err2;
+	IP="8.8.8.8";
 
 elif [[ $1 =~ ^([0-9]{1,3}\.){3,3}[0-9]{1,3}$ ]]; then
 	IP=$1;
@@ -143,8 +143,8 @@ function logLines() {
 function maintainLog() {
 	while true
 	do
-		sleep 60;
-		# delete first lines every minute, when log exceedes set size
+		# check log size every half interval time. Delete first lines if exceeding set size
+		sleep "$(($interval/2))";
 		if [[ $(logLines) -gt $LOGSIZE ]]; then
 			deleteLines=$(($(logLines)-$LOGSIZE));
 			sed -i "1,${deleteLines}d" "$LOGFILE";
@@ -153,23 +153,29 @@ function maintainLog() {
 }
 
 function summary() {
-	while [[ -n ${arr[@]} ]]; do
-		sleep $interval;
-		for i in "${arr[@]}"; do
-			sleep 0.1;
-			echo "" >> $LOGFILE;
-			echo "*** $i $(date | awk '{print $2,$3,$4}') ***" >> $LOGFILE;
-			kill -SIGQUIT $(ps -fC ping | grep $i | awk '{print $2}');
+	# check if IP array exist. If not start function again in 1 sec
+	if [[ $arr ]]; then
+		while true; do
+			sleep $interval;
+			for i in "${arr[@]}"; do
+				sleep 0.1;
+				echo "" >> $LOGFILE;
+				echo "*** $i $(date | awk '{print $2,$3,$4}') ***" >> $LOGFILE;
+				kill -SIGQUIT $(ps -fC ping | grep $i | awk '{print $2}');
+			done;
 		done;
-	done;
+	else
+		sleep 1;
+		summary;
+	fi;
 }
 
 # Notification of logfile
 echo "Ping summary stored in file $LOGFILE";
 
-# Call log and summary functions and kill previous service
+# Call log and summary functions
 maintainLog & summary &
-# start pings to all route IPs
+# start pings to all route IPs and log errout which contains SIGQUIT summary
 for i in "${arr[@]}";
 do
 	ping -q $i 1> /dev/null 2>> $LOGFILE &
