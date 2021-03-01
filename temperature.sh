@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 #ANSI colur code variables
-red="\e[0;91m";
-yellow="\e[0;93m";
-blue="\e[0;94m";
+red="\x1B[0;91m";
+yellow="\x1B[0;93m";
+blue="\x1B[0;94m";
 
-reset="\e[0m";
+reset="\033[0m";
 
 # Add different temp sensors to array
 tempArr=($(cat $(find /sys/devices/ -name 'temp1_input' 2> /dev/null)));
@@ -30,5 +30,5 @@ for (( i=0; i<${#tempArr[@]}; i++ )); do
         color=$yellow;
     else color=$blue;
     fi;
-    echo -e ${color}${sensor} $(awk "BEGIN { print ${tempArr[$i]}/1000 }" )$'\xc2\xb0'C"${reset}";
+    echo -e ${sensor} $(awk "BEGIN { print ${tempArr[$i]}/1000 }" )$'\xc2\xb0'C;
 done;
