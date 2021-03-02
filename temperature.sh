@@ -11,8 +11,7 @@ reset="\e[0m";
 denominator="\xc2\xb0C";
 
 # Iteration
-function iteration() {
-    
+while true; do    
     # Add different temp sensors to array
     tempArr=($(cat $(find /sys/devices/ -name 'temp1_input' 2> /dev/null)));
     
@@ -30,9 +29,11 @@ function iteration() {
         sensor=$(awk "BEGIN { print ${tempArr[$i]}/1000 }");
         echo -e "${color}${sensorType}${sensor}${denominator}${reset}";
     done;
-    sleep 1;
-    clear;
-    iteration;
-}
-clear;
-iteration;
+
+    # Refresh interval and refresh line by line
+    sleep 2;
+    tput cuu1;  # cursor up one line
+    tput el;    # clear line
+    tput cuu1;
+    tput el;
+done;
