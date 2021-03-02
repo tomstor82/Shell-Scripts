@@ -26,5 +26,5 @@ for (( i=0; i<${#tempArr[@]}; i++ )); do
     else color=$blue;
     fi;
     sensor=$(awk "BEGIN { print ${tempArr[$i]}/1000 }");
-    echo -e "${red}${sensorType}${sensor}${denominator}${reset}";
+    echo -e "${color}${sensorType}${sensor}${denominator}${reset}";
 done;
