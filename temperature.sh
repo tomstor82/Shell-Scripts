@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 #ANSI colur code variables \e \033 \xb1
 red="\e[91m";
@@ -30,10 +30,10 @@ while true; do
         echo -e "${color}${sensorType}${sensor}${denominator}${reset}";
     done;
 
-    # Refresh interval and refresh line by line
+    # Refresh interval and refresh number of lines detected by tempArr
     sleep 2;
-    tput cuu1;  # cursor up one line
-    tput el;    # clear line
-    tput cuu1;
-    tput el;
+    for (( l=${#tempArr[@]}; l > 0; l-- )); do
+        tput cuu1;  # cursor up one line
+        tput el;    # clear line
+    done;
 done;
